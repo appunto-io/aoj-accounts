@@ -1,0 +1,44 @@
+{
+  "name": "@appunto/aoj-accounts",
+  "version": "0.0.1",
+  "description": "Accounts model for API on JSON framework",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha './src/**/*.test.js' --timeout 50000 --exit",
+    "doc": "jsdoc -c jsdoc.conf.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/appunto-io/aoj-accounts.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/appunto-io/aoj-accounts/issues"
+  },
+  "homepage": "https://github.com/appunto-io/aoj-accounts#readme",
+  "devDependencies": {
+    "mongoose": "^5.7.13",
+    "mocha": "^6.2.2",
+    "mongodb-memory-server": "^6.0.2",
+    "eslint": "^5.0.1",
+    "eslint-loader": "^2.0.0",
+    "dotenv": "^8.2.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0"
+  },
+  "dependencies": {
+    "@appunto/api-on-json": "^0.1.4",
+    "bcrypt": "^3.0.6",
+    "core-js": "^2.6.10",
+    "generate-password": "^1.4.1",
+    "handlebars": "^4.0.12",
+    "invariant": "^2.2.4",
+    "jsonwebtoken": "^8.3.0",
+    "locale-code": "^2.0.1",
+    "node-fetch": "^2.6.0",
+    "nodemailer": "^4.6.8",
+    "nodemailer-mailgun-transport": "^1.4.0",
+    "randomatic": "^3.1.1"
+  }
+}

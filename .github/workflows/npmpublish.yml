@@ -1,0 +1,26 @@
+name: Appunto Publish
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*version*'
+
+jobs:
+  publish-npm:
+    name: Publish NPM
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm run test:mongo
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
