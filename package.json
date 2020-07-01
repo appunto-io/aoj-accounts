@@ -28,7 +28,7 @@
     "chai-http": "^4.3.0"
   },
   "dependencies": {
-    "@appunto/api-on-json": "^0.1.4",
+    "@appunto/api-on-json": "^0.1.13",
     "bcrypt": "^3.0.6",
     "core-js": "^2.6.10",
     "generate-password": "^1.4.1",
