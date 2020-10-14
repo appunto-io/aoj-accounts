@@ -42,7 +42,7 @@ function createAccountsApiModel(options = {}) {
   } = options;
 
   const dataModel = new DataModel(accountsDataModel);
-  const apiModel  = new ApiModel(accountsApiModel);
+  const apiModel  = new ApiModel(dataModel.toApi(), accountsApiModel);
 
   if (email) {
     dataModel.addModel(emailDataModel);

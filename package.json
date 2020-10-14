@@ -4,8 +4,8 @@
   "description": "Accounts model for API on JSON framework",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha './src/**/*.test.js' --timeout 50000 --exit",
-    "doc": "jsdoc -c jsdoc.conf.json"
+    "version": "auto-changelog -p && git add CHANGELOG.md",
+    "test": "mocha './src/**/*.test.js' --timeout 50000 --exit"
   },
   "repository": {
     "type": "git",
@@ -18,14 +18,15 @@
   },
   "homepage": "https://github.com/appunto-io/aoj-accounts#readme",
   "devDependencies": {
-    "mongoose": "^5.7.13",
-    "mocha": "^6.2.2",
-    "mongodb-memory-server": "^6.0.2",
+    "auto-changelog": "^2.2.1",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "dotenv": "^8.2.0",
     "eslint": "^5.0.1",
     "eslint-loader": "^2.0.0",
-    "dotenv": "^8.2.0",
-    "chai": "^4.2.0",
-    "chai-http": "^4.3.0"
+    "mocha": "^6.2.2",
+    "mongodb-memory-server": "^6.0.2",
+    "mongoose": "^5.7.13"
   },
   "dependencies": {
     "@appunto/api-on-json": "^0.1.13",

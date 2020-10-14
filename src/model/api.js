@@ -14,6 +14,16 @@ const {
 
 const accountsApiModel = {
   '/accounts' : {
+    auth : {
+      read  : { requiresAuth : true, requiresRoles : ['root'] },
+      write : false
+    },
+    '/:id' : {
+      auth : {
+        read  : { requiresAuth : true, requiresRoles : ['root'] },
+        write : { requiresAuth : true, requiresRoles : ['root'] }
+      }
+    },
     '/new' : {
       auth : {
         POST : { requiresAuth : false }
@@ -29,7 +39,7 @@ const accountsApiModel = {
 
   '/roles' : {
     auth : {
-      requiresRoles : ['admin']
+      requiresRoles : ['root']
     }
   },
 

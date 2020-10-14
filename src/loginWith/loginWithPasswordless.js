@@ -61,7 +61,7 @@ const loginWithPasswordless = async (data, flow, meta) => {
       }
 
 
-      const randomCode = randomize(randomPattern, randomLenght);
+      const randomCode = randomize(randomPattern, randomLength);
 
       codes.push({code: randomCode, expiresAt: new Date(Date.now() + codeTtl)});
 

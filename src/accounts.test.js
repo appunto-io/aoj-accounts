@@ -12,24 +12,26 @@ const {
   createRootAccount } = require('./index.js');
 
 
+const TEST_PORT = 8123;
+
 const expect = chai.expect;
 chai.use(chaiHTTP);
 
 async function get(collection, token) {
-  return chai.request('http://localhost:3000')
+  return chai.request(`http://localhost:${TEST_PORT}`)
     .get(`/${collection}`)
     .set('Authorization', token);
 }
 
 async function post(collection, data, token) {
-  return chai.request('http://localhost:3000')
+  return chai.request(`http://localhost:${TEST_PORT}`)
     .post(`/${collection}`)
     .set('Authorization', token)
     .send(data);
 }
 
 async function erase(collection, id, token) {
-  return chai.request('http://localhost:3000')
+  return chai.request(`http://localhost:${TEST_PORT}`)
     .delete(`/${collection}/` + id)
     .set('Authorization', token);
 }
@@ -74,7 +76,7 @@ describe('account-model test suite', async function() {
           }
         };
 
-        await createRootAccount('root@root.com', 'pass', db).then(
+        await createRootAccount(db, 'root@root.com', 'pass').then(
           rootAccountId => {
             if (rootAccountId) {
               console.log(`Root account ${rootAccountId} created`);
@@ -87,7 +89,7 @@ describe('account-model test suite', async function() {
         );
 
         this.server  = apiModel.toServer(serverOptions);
-        await this.server.listen(3000);
+        await this.server.listen(TEST_PORT);
         done()});
     });
 
@@ -95,6 +97,47 @@ describe('account-model test suite', async function() {
       await this.server.close();
       await mongoose.disconnect();
       await mongoServer.stop();
+    });
+
+
+    describe('model access', async function() {
+      let token;
+      let accountId;
+
+      before(async () => {
+        const response = await post('logins', {
+          method: "email",
+          data: {
+            email:'root@root.com',
+            password: 'pass'
+          }
+        }, '');
+
+        token = 'Bearer ' + (response.body || {}).token;
+        accountId = ((response.body || {})).accountId;
+      });
+
+      it('should be able to retrieve list of accounts', async function () {
+        const response = await get('accounts', token);
+        const { data } = response.body || {};
+
+        expect(response.status).to.be.equal(200);
+        expect(data).to.be.a('array');
+        expect(data.length).to.equal(1);
+      });
+
+      it('should not be able to directly post to accounts endpoint', async function () {
+        const response = await post('accounts', {}, token);
+
+        expect(response.status).to.be.equal(405);
+      });
+
+      it('should not be able to directly post to accounts endpoint', async function () {
+        const response = await get(`accounts/${accountId}`, token);
+
+        expect(response.status).to.be.equal(200);
+        expect(response.body.id).to.equal(accountId);
+      });
     });
 
     describe('generic account-model test suite', async function() {
@@ -264,7 +307,7 @@ describe('account-model test suite', async function() {
           expect(response.body).to.be.empty;
         });
 
-        it('it test the delete chain', async function() {
+        it('test the delete chain', async function() {
           const email = 'email@example.com';
           await post('logins', {
             method: "passwordless",
