@@ -224,8 +224,8 @@ const errorIfNotLoggedIn = async (data, flow, meta) => {
   return flow.continue(data);
 };
 
-const loadRoles = async (data, flow, meta) => {
-  console.info('AccountsModel.loadRoles()');
+const loadAccountData = async (data, flow, meta) => {
+  console.info('AccountsModel.loadAccountData()');
 
   const { db } = meta.environment || {};
 
@@ -240,7 +240,7 @@ const loadRoles = async (data, flow, meta) => {
     const document = await db.readOne('accounts', accountId);
 
     if (document) {
-      return flow.continue({...data, roles : document.roles || []});
+      return flow.continue({...data, roles : document.roles || [], resources : document.resources || []});
     }
 
     return flow.stop(401, 'Invalid credentials');
@@ -260,14 +260,30 @@ const createJWT = async (data, flow, meta) => {
     jwtTtl = DEFAULT_JWT_TTL
   } = environment;
 
-  const {accountId, roles} = data;
+  const {accountId, roles, resources} = data;
+
+  const resourcesDictionary = resources.reduce(
+    (dictionary, {key, value}) => {
+      if(!dictionary[key]) {
+        dictionary[key] = [];
+      }
+
+      if(!dictionary[key].includes(value)) {
+        dictionary[key].push(value);
+      }
+
+      return dictionary;
+
+    },
+    {}
+  );
 
   if (!jwtSecret) {
     console.error('AccountsModel.createJWT(): JWT secret not provided! Login is not allowed: potential security risk.');
     return flow.stop(500);
   }
 
-  const token = jwt.sign({accountId, roles}, jwtSecret, {expiresIn: jwtTtl});
+  const token = jwt.sign({accountId, roles, resources : resourcesDictionary}, jwtSecret, {expiresIn: jwtTtl});
 
   console.info(`AccountsModel.createJWT(): Account ${accountId} logged in.`);
 
@@ -458,7 +474,7 @@ module.exports = {
   createNewEmailCredentials,
   sendWelcomeEmail,
   errorIfNotLoggedIn,
-  loadRoles,
+  loadAccountData,
   createJWT,
   createRenewJWT,
   lostPassword,

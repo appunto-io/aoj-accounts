@@ -6,7 +6,7 @@ const {
   createNewEmailCredentials,
   sendWelcomeEmail,
   errorIfNotLoggedIn,
-  loadRoles,
+  loadAccountData,
   createJWT,
   createRenewJWT,
   checkRenewToken
@@ -50,7 +50,7 @@ const accountsApiModel = {
     handlers : {
       POST : [
         errorIfNotLoggedIn,
-        loadRoles,
+        loadAccountData,
         createJWT,
         createRenewJWT,
         sanitizeAllow('token', 'renewToken', 'accountId')
@@ -66,7 +66,7 @@ const accountsApiModel = {
       handlers : {
         POST : [
           checkRenewToken,
-          loadRoles,
+          loadAccountData,
           createJWT,
           createRenewJWT,
           sanitizeAllow('token', 'renewToken', 'accountId')
