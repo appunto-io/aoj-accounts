@@ -19,12 +19,13 @@ const loginWithEmail = async (data, flow, meta) => {
 
       if (document) {
         const verifyAccount = await db.readOne('accounts', document.accountId);
+        const { id, ...accountDocument } = verifyAccount;
 
         if (verifyAccount && verifyAccount.active) {
           const logged = await bcrypt.compare(password, document.password);
 
           if (logged) {
-            return flow.continue({ accountId : document.accountId });
+            return flow.continue({ accountId : document.accountId, ...accountDocument });
           }
 
           if (document.recoveryPassword) {
@@ -32,7 +33,8 @@ const loginWithEmail = async (data, flow, meta) => {
 
             if (recoveryLoggged && document.recoveryExpiresAt > Date.now()) {
               return flow.continue({
-                accountId : document.accountId
+                accountId : document.accountId,
+                ...accountDocument
               });
             }
           }

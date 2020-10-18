@@ -1,4 +1,4 @@
-require("dotenv").config({path: __dirname + '/../dev/.env'});
+require("dotenv").config({path: __dirname + '/../.env'});
 
 const mongoose              = require('mongoose');
 const jwt                   = require('jsonwebtoken');
@@ -177,8 +177,6 @@ describe('account-model test suite', async function() {
 
         const newToken = response2.body.token;
 
-        console.log(newToken);
-
         const payload = jwt.verify(newToken, JWT_SECRET);
 
         expect(payload.resources.entity).to.be.an('array');
@@ -261,19 +259,19 @@ describe('account-model test suite', async function() {
         });
 
 
-        // it('create an account and log in', async function() {
-        //   const response = await post('accounts/new', {
-        //     method: 'email',
-        //     data: {
-        //       email:'hello@hi.com',
-        //       password: 'pass'
-        //     }
-        //   }, '');
-        //
-        //   expect(response.status).to.be.equal(200);
-        //   expect(response.body.email).to.be.equal('hello@hi.com');
-        //   expect(response.body.id).to.be.a('string');
-        // });
+        it('create an account and log in', async function() {
+          const response = await post('accounts/new', {
+            method: 'email',
+            data: {
+              email:'hello@hi.com',
+              password: 'pass'
+            }
+          }, '');
+
+          expect(response.status).to.be.equal(200);
+          expect(response.body.email).to.be.equal('hello@hi.com');
+          expect(response.body.id).to.be.a('string');
+        });
 
         it('fails to create an account with an existing email', async function() {
           const response = await post('accounts/new', {

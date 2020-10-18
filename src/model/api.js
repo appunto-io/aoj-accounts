@@ -53,7 +53,6 @@ const accountsApiModel = {
         loadAccountData,
         createJWT,
         createRenewJWT,
-        sanitizeAllow('token', 'renewToken', 'accountId')
       ]
     },
     filters : {
