@@ -186,7 +186,14 @@ describe('account-model test suite', async function() {
         expect(payload.resources.entity.includes('1')).to.equal(true);
         expect(payload.resources.entity.includes('2')).to.equal(true);
         expect(payload.resources.category.includes('2')).to.equal(true);
+      });
 
+      it('should be able to read its own account information', async function () {
+        const response = await get(`me`, token);
+
+        expect(response.status).to.be.equal(200);
+        expect(response.body.id).to.equal(accountId);
+        expect(response.body.roles).to.be.an('array');
       });
     });
 

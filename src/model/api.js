@@ -9,10 +9,19 @@ const {
   loadAccountData,
   createJWT,
   createRenewJWT,
-  checkRenewToken
+  checkRenewToken,
+  getSelf
 } = require('./library.js');
 
 const accountsApiModel = {
+  '/me' : {
+    auth : {
+      GET : { requiresAuth : true }
+    },
+    handlers : {
+      GET : [getSelf]
+    }
+  },
   '/accounts' : {
     auth : {
       read  : { requiresAuth : true, requiresRoles : ['root'] },

@@ -467,6 +467,27 @@ const checkRenewToken = async (data, flow, meta) => {
   }
 };
 
+const getSelf = async (data, flow, meta) => {
+  console.info('AccountsModel.getSelf()');
+
+  const { db } = meta.environment || {};
+  const { accountId } = meta.auth || {};
+
+  try {
+    const document = await db.readOne('accounts', accountId);
+
+    if (document && document.active) {
+      return flow.continue(document);
+    }
+
+    return flow.stop(404, 'Invalid account');
+  }
+  catch (error) {
+    console.error(error);
+    return flow.stop(400, error.message);
+  }
+}
+
 
 module.exports = {
   checkDuplicateEmailAuth,
@@ -480,5 +501,6 @@ module.exports = {
   lostPassword,
   changePassword,
   checkRenewToken,
-  sendEmail
+  sendEmail,
+  getSelf
 };
