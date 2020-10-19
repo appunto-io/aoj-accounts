@@ -412,7 +412,7 @@ const changePassword = async (data, flow, meta) => {
     if (document) {
       const bcrypted = await bcrypt.hash(password, saltRounds);
 
-      await db.patch('accounts', accountId, {password: bcrypted, recoveryPassword: ''});
+      await db.patch('emailCredentials', document.id, {password: bcrypted, recoveryPassword: ''});
       return flow.continue(data);
     }
 
