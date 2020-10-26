@@ -344,7 +344,7 @@ const lostPassword = async (data, flow, meta) => {
       const newPassword = passwordGenerator.generate();
       const bcrypted    = await bcrypt.hash(newPassword, saltRounds);
 
-      await db.patch('accounts', document.accountId, {
+      await db.patch('emailCredentials', document.id, {
         recoveryPassword: bcrypted,
         recoveryExpiresAt: new Date(Date.now() + RECOVERY_PASSWORD_TTL)
       });
