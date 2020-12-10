@@ -1,11 +1,8 @@
 const fetch = require('node-fetch');
 const randomize = require('randomatic');
 
-const {
-  changePassword,
-  lostPassword,
-  sendEmail
-} = require('../model/library.js');
+const VoidMailer = require('../mailers/voidmailer');
+const voidMailer = new VoidMailer();
 
 const DEFAULT_CODE_TTL = 10 * 60 * 1000;
 const DEFAULT_PATTERN = '0';
@@ -17,7 +14,9 @@ const loginWithPasswordless = async (data, flow, meta) => {
   const { db,
           codeTtl = DEFAULT_CODE_TTL,
           randomPattern = DEFAULT_PATTERN,
-          randomLength = DEFAULT_RANDOM_LENGHT } = meta.environment || {};
+          randomLength = DEFAULT_RANDOM_LENGHT,
+          mailer = voidMailer
+        } = meta.environment || {};
 
   const { method, data: { email, code } } = meta.request.body;
 
@@ -71,19 +70,21 @@ const loginWithPasswordless = async (data, flow, meta) => {
         await db.create('passwordlessCredentials', {accountId: false, email, codes});
       }
 
-      const {
-        mailgun = false,
-        accountsAPI = {} } = meta.environment || {};
+      const emailSent = mailer.sendPasswordlessCode(email, {data : {code : randomCode}})
 
-      const sender = accountsAPI.welcomeEmailSender || accountsAPI.sender || '';
+      // const {
+      //   mailgun = false,
+      //   accountsAPI = {} } = meta.environment || {};
 
-      const emailSent = await sendEmail({
-        mailgun,
-        email,
-        sender,
-        subject: 'Your authentication code',
-        html: `<b>Code: ${randomCode}</b>`
-      });
+      // const sender = accountsAPI.welcomeEmailSender || accountsAPI.sender || '';
+      //
+      // const emailSent = await sendEmail({
+      //   mailgun,
+      //   email,
+      //   sender,
+      //   subject: 'Your authentication code',
+      //   html: `<b>Code: ${randomCode}</b>`
+      // });
 
       if (!emailSent) {
         console.error('AccountsModel.loginWithPasswordless(): unable to send code authentication email. See error above.');

@@ -7,21 +7,24 @@ const handlebars = require('handlebars');
 const isPlainObject = require('lodash.isplainobject');
 const passwordGenerator = require('generate-password');
 
+const VoidMailer = require('../mailers/voidmailer');
+const voidMailer = new VoidMailer();
+
 const saltRounds = 10;
 
 const UNKNOWN_JWT_SECRET    = '-- Unknown jwt secret --';
 const DEFAULT_JWT_TTL       = 60 * 60 * 1000;
 const DEFAULT_RENEW_JWT_TTL = 30 * 24 * 60 * 60 * 1000;
 const DEFAULT_LOCALE        = 'fr-FR';
-const DEFAULT_WELCOME_EMAIL_SUBJECT = 'Subscription';
-const DEFAULT_WELCOME_EMAIL = 'Welcome {{username}}!';
-const DEFAULT_ATTACHMENTS   = [];
-
-const DEFAULT_LOST_PASSWORD_EMAIL_SUBJECT = 'Password reset';
-const DEFAULT_LOST_PASSWORD_EMAIL =
-`<p>Your temporary password is <code>{{password}}</code></p>
-<p>This password is valid during 7 days.</p>
-`;
+// const DEFAULT_WELCOME_EMAIL_SUBJECT = 'Subscription';
+// const DEFAULT_WELCOME_EMAIL = 'Welcome {{username}}!';
+// const DEFAULT_ATTACHMENTS   = [];
+//
+// const DEFAULT_LOST_PASSWORD_EMAIL_SUBJECT = 'Password reset';
+// const DEFAULT_LOST_PASSWORD_EMAIL =
+// `<p>Your temporary password is <code>{{password}}</code></p>
+// <p>This password is valid during 7 days.</p>
+// `;
 
 
 const RECOVERY_PASSWORD_TTL = 7 * 24 * 60 * 60 * 1000;
@@ -29,45 +32,45 @@ const RECOVERY_PASSWORD_TTL = 7 * 24 * 60 * 60 * 1000;
 /*
 Factorized funciton to send email, used by sign up and lost password functions
  */
-const sendEmail = async(options) => {
-
-  const { mailgun, sender, email, subject, html } = options;
-
-  if (!email) {
-    console.warn('AccountsModel.sendEmail(): Unable to send welcome email, email missing.');
-    return false;
-  }
-
-  if (!mailgun) {
-    console.warn('AccountsModel.sendEmail(): Unable to send welcome email, Mailgun configuraiton missing.');
-    return false;
-  }
-
-  const mailer = nodemailer.createTransport(mailgunTransport({
-    auth : {
-      'api_key' : mailgun.apiKey,
-      'domain'  : mailgun.domain
-    }
-  }));
-
-
-
-  await new Promise((resolve, reject) => {
-    mailer.sendMail({
-      from    : sender,
-      to      : email,
-      subject : subject,
-      html    : html
-    }, function (err, info) {
-      if (err) {
-        console.warn(`AccountsModel.sendEmail(): Unable to send welcome email, mailer error '${err}'`);
-      }
-      resolve();
-    });
-  });
-
-  return true;
-};
+// const sendEmail = async(options) => {
+//
+//   const { mailgun, sender, email, subject, html } = options;
+//
+//   if (!email) {
+//     console.warn('AccountsModel.sendEmail(): Unable to send welcome email, email missing.');
+//     return false;
+//   }
+//
+//   if (!mailgun) {
+//     console.warn('AccountsModel.sendEmail(): Unable to send welcome email, Mailgun configuraiton missing.');
+//     return false;
+//   }
+//
+//   const mailer = nodemailer.createTransport(mailgunTransport({
+//     auth : {
+//       'api_key' : mailgun.apiKey,
+//       'domain'  : mailgun.domain
+//     }
+//   }));
+//
+//
+//
+//   await new Promise((resolve, reject) => {
+//     mailer.sendMail({
+//       from    : sender,
+//       to      : email,
+//       subject : subject,
+//       html    : html
+//     }, function (err, info) {
+//       if (err) {
+//         console.warn(`AccountsModel.sendEmail(): Unable to send welcome email, mailer error '${err}'`);
+//       }
+//       resolve();
+//     });
+//   });
+//
+//   return true;
+// };
 
 
 
@@ -129,7 +132,7 @@ const createNewAccount = async (data, flow, meta) => {
 
     meta.accountsAPI = Object.assign(meta.accountsAPI || {}, {locale});
 
-    return flow.continue({id : saved.id});
+    return flow.continue({id : saved.id, locale, roles});
   }
   catch (error) {
     return flow.stop(400, error.message);
@@ -168,39 +171,41 @@ Send welcome email through Mailgun
 const sendWelcomeEmail = async (data, flow, meta) => {
   console.info('AccountsModel.sendWelcomeEmail()');
 
-  const { db } = meta.environment || {};
+  const { db, mailer = voidMailer } = meta.environment || {};
 
   const {email = false} =  data;
-  const { mailgun = false, accountsAPI = {} } = meta.environment || {};
 
-  const locale    = accountsAPI.locale || DEFAULT_LOCALE;
-  const templates = accountsAPI.lostPasswordEmail || DEFAULT_LOST_PASSWORD_EMAIL;
-  const subjects  = accountsAPI.lostPasswordSubject || DEFAULT_LOST_PASSWORD_EMAIL_SUBJECT;
-  const sender    = accountsAPI.welcomeEmailSender || accountsAPI.sender || '';
-
-  const language   = LocaleCode.getLanguageCode(locale);
-
-  const templateHB = handlebars.compile(isPlainObject(templates) ? templates[language] : templates);
-  const subjectHB  = handlebars.compile(isPlainObject(subjects) ? subjects[language] : subjects);
-
-  const hbContext = {username : email};
-
-  const subject = subjectHB(hbContext);
-  const html    = templateHB(hbContext);
-
-  const attachments = accountsAPI.attachments || DEFAULT_ATTACHMENTS;
-
-  const emailSent = await sendEmail({
-    mailgun,
-    email,
-    sender,
-    subject,
-    html,
-    attachments
-  });
+  const emailSent = mailer.sendWelcome(email, {data});
+  // const { mailgun = false, accountsAPI = {} } = meta.environment || {};
+  //
+  // const locale    = accountsAPI.locale || DEFAULT_LOCALE;
+  // const templates = accountsAPI.lostPasswordEmail || DEFAULT_LOST_PASSWORD_EMAIL;
+  // const subjects  = accountsAPI.lostPasswordSubject || DEFAULT_LOST_PASSWORD_EMAIL_SUBJECT;
+  // const sender    = accountsAPI.welcomeEmailSender || accountsAPI.sender || '';
+  //
+  // const language   = LocaleCode.getLanguageCode(locale);
+  //
+  // const templateHB = handlebars.compile(isPlainObject(templates) ? templates[language] : templates);
+  // const subjectHB  = handlebars.compile(isPlainObject(subjects) ? subjects[language] : subjects);
+  //
+  // const hbContext = {username : email};
+  //
+  // const subject = subjectHB(hbContext);
+  // const html    = templateHB(hbContext);
+  //
+  // const attachments = accountsAPI.attachments || DEFAULT_ATTACHMENTS;
+  //
+  // const emailSent = await sendEmail({
+  //   mailgun,
+  //   email,
+  //   sender,
+  //   subject,
+  //   html,
+  //   attachments
+  // });
 
   if (!emailSent) {
-    console.error('AccountsModel.sendWelcomeEmail(): unable to send password reset email. See error above.');
+    console.error('AccountsModel.sendWelcomeEmail(): unable to send welcome email. See error above.');
   }
 
   return flow.continue(data);
@@ -326,7 +331,7 @@ const createRenewJWT = async (data, flow, meta) => {
 const lostPassword = async (data, flow, meta) => {
   console.info('AccountsModel.lostPassword()');
 
-  const { db } = meta.environment || {};
+  const { db, mailer = voidMailer } = meta.environment || {};
 
   const model = db.models['emailCredentials'];
   if (!model) {
@@ -349,34 +354,36 @@ const lostPassword = async (data, flow, meta) => {
         recoveryExpiresAt: new Date(Date.now() + RECOVERY_PASSWORD_TTL)
       });
 
+      const emailSent = mailer.sendLostPassword(email, {data : {
+        password : newPassword
+      }});
 
-      const { email } = meta.request.body;
-      const { mailgun = false, accountsAPI = {} } = meta.environment || {};
-
-      const locale    = accountsAPI.locale || DEFAULT_LOCALE;
-      const templates = accountsAPI.lostPasswordEmail || DEFAULT_LOST_PASSWORD_EMAIL;
-      const subjects  = accountsAPI.lostPasswordSubject || DEFAULT_LOST_PASSWORD_EMAIL_SUBJECT;
-      const sender    = accountsAPI.welcomeEmailSender || accountsAPI.sender || '';
-
-      const language   = LocaleCode.getLanguageCode(locale);
-
-      const templateHB = handlebars.compile(isPlainObject(templates) ? templates[language] : templates);
-      const subjectHB  = handlebars.compile(isPlainObject(subjects) ? subjects[language] : subjects);
-
-      const hbContext = {password : newPassword};
-
-      const subject = subjectHB(hbContext);
-      const html    = templateHB(hbContext);
-      const attachments = accountsAPI.attachments || DEFAULT_ATTACHMENTS;
-
-      const emailSent = await sendEmail({
-        mailgun,
-        email,
-        sender,
-        subject,
-        html,
-        attachments
-      });
+      // const { mailgun = false, accountsAPI = {} } = meta.environment || {};
+      //
+      // const locale    = accountsAPI.locale || DEFAULT_LOCALE;
+      // const templates = accountsAPI.lostPasswordEmail || DEFAULT_LOST_PASSWORD_EMAIL;
+      // const subjects  = accountsAPI.lostPasswordSubject || DEFAULT_LOST_PASSWORD_EMAIL_SUBJECT;
+      // const sender    = accountsAPI.welcomeEmailSender || accountsAPI.sender || '';
+      //
+      // const language   = LocaleCode.getLanguageCode(locale);
+      //
+      // const templateHB = handlebars.compile(isPlainObject(templates) ? templates[language] : templates);
+      // const subjectHB  = handlebars.compile(isPlainObject(subjects) ? subjects[language] : subjects);
+      //
+      // const hbContext = {password : newPassword};
+      //
+      // const subject = subjectHB(hbContext);
+      // const html    = templateHB(hbContext);
+      // const attachments = accountsAPI.attachments || DEFAULT_ATTACHMENTS;
+      //
+      // const emailSent = await sendEmail({
+      //   mailgun,
+      //   email,
+      //   sender,
+      //   subject,
+      //   html,
+      //   attachments
+      // });
 
       if (!emailSent) {
         console.error('AccountsModel.lostPassword(): unable to send password reset email. See error above.');
@@ -501,6 +508,5 @@ module.exports = {
   lostPassword,
   changePassword,
   checkRenewToken,
-  sendEmail,
   getSelf
 };

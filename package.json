@@ -40,6 +40,7 @@
     "node-fetch": "^2.6.0",
     "nodemailer": "^4.6.8",
     "nodemailer-mailgun-transport": "^1.4.0",
-    "randomatic": "^3.1.1"
+    "randomatic": "^3.1.1",
+    "sib-api-v3-sdk": "^8.0.2"
   }
 }

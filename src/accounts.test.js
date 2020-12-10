@@ -7,9 +7,13 @@ const chaiHTTP              = require('chai-http');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const { Mongo }             = require('@appunto/api-on-json');
 
+
 const {
   createAccountsApiModel,
   createRootAccount } = require('./index.js');
+
+const TestMailer = require('./mailers/testmailer');
+const testMailer = new TestMailer();
 
 
 const TEST_PORT  = 8123;
@@ -79,14 +83,7 @@ describe('account-model test suite', async function() {
           randomPattern : 'A0',
           jwtSecret : JWT_SECRET,
           renewJwtSecret : '--renew--',
-          mailgun : {
-            apiKey : process.env.API_KEY,
-            domain : process.env.DOMAIN
-          },
-          accountsAPI : {
-            welcomeEmailSender : 'contact@appunto.io',
-            sender : 'contact@appunto.io'
-          }
+          mailer : testMailer
         };
 
         await Promise.all(TEST_USERS.map(
