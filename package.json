@@ -3,6 +3,7 @@
   "version": "0.1.0-1",
   "description": "Accounts model for API on JSON framework",
   "main": "src/index.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "version": "auto-changelog -p && git add CHANGELOG.md",
     "test": "mocha './src/**/*.test.js' --timeout 50000 --exit"
@@ -29,7 +30,7 @@
     "mongoose": "^5.7.13"
   },
   "dependencies": {
-    "@appunto/api-on-json": "^0.1.13",
+    "@appunto/api-on-json": "^0.2.4-1",
     "bcrypt": "^5.0.0",
     "core-js": "^2.6.10",
     "generate-password": "^1.4.1",
