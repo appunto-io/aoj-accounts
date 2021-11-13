@@ -1,6 +1,6 @@
 {
   "name": "@appunto/aoj-accounts",
-  "version": "0.1.0-5",
+  "version": "0.1.0-6",
   "description": "Accounts model for API on JSON framework",
   "main": "src/index.js",
   "types": "types/index.d.ts",
