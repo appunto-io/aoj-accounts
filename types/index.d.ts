@@ -34,5 +34,9 @@ export declare type SibMailerOptions = {
   mapTemplateId : (type : string, options ?: SibSendOptions) => number;
 }
 export declare type SibSendOptions = {
-  data ?: Record<string, string>;
+  data ?: SendOptionsData;
+}
+
+type SendOptionsData = {
+  [key : string] : string | number | undefined | SendOptionsData;
 }
