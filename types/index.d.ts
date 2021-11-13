@@ -17,7 +17,7 @@ export declare function createRootAccount(
 
 export declare class Mailer {
   constructor(options : any);
-  async send(templateId : string | number, to : string, params ?: Record<string, string>) : Promise<true | undefined>;
+  async send(templateId : string | number, to : string, params ?: SendOptionsData) : Promise<true | undefined>;
   async sendLostPassword(to : string, options ?: SibSendOptions) : Promise<true | undefined>;
   async sendWelcome(to : string, options ?: SibSendOptions) : Promise<true | undefined>;
   async sendPasswordlessCode(to : string, options ?: SibSendOptions) : Promise<true | undefined>;
