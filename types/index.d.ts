@@ -24,7 +24,8 @@ export declare class Mailer {
 }
 
 export declare class SibMailer extends Mailer {
-  constructor(options : SibMailerOptions)
+  constructor(options : SibMailerOptions);
+  mapTemplateId : (type : string, options ?: SibSendOptions) => number;
 }
 export declare class TestMailer extends Mailer {}
 
