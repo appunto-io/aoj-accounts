@@ -40,3 +40,28 @@ export declare type SibSendOptions = {
 type SendOptionsData = {
   [key : string] : string | number | undefined | SendOptionsData;
 }
+
+export declare class SMTPMailer extends Mailer {
+  constructor(options : SMTPMailerOptions);
+}
+
+export declare type SMTPMailerOptions = {
+  from : string;
+  mapToContent : SMTPMapToContent;
+  nodemailer : {
+    host: string;
+    port: number;
+    secure: boolean;
+    auth: {
+      user: string;
+      pass: string;
+    };
+  }
+}
+
+export declare type SMTPMapToContent = (type : string, options : any) => SMTPContent;
+export declare type SMTPContent = {
+  subject : string,
+  text : string,
+  html : string
+}
