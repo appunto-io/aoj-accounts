@@ -120,7 +120,7 @@ const createNewAccount = async (data, flow, meta) => {
 
   const { db } = meta.environment || {};
 
-  let { locale, roles = [] } = meta.request.body;
+  let { locale, roles = [], resources = [] } = meta.request.body;
 
   if (!locale || !LocaleCode.validateLanguageCode(locale) || !LocaleCode.validateCountryCode(locale)) {
     const { accountsAPI = {} } = meta.environment || {};
@@ -128,11 +128,11 @@ const createNewAccount = async (data, flow, meta) => {
   }
 
   try {
-    const saved = await db.create('accounts', { locale, roles });
+    const saved = await db.create('accounts', { locale, roles, resources });
 
     meta.accountsAPI = Object.assign(meta.accountsAPI || {}, {locale});
 
-    return flow.continue({id : saved.id, locale, roles});
+    return flow.continue({id : saved.id, locale, roles, resources});
   }
   catch (error) {
     return flow.stop(400, error.message);
