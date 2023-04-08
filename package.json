@@ -30,7 +30,7 @@
     "mongoose": "^5.7.13"
   },
   "dependencies": {
-    "@appunto/api-on-json": "^0.2.4-1",
+    "@appunto/api-on-json": "^0.2.7",
     "bcrypt": "^5.0.0",
     "core-js": "^2.6.10",
     "generate-password": "^1.4.1",
