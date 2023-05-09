@@ -175,7 +175,7 @@ const sendWelcomeEmail = async (data, flow, meta) => {
 
   const {email = false} =  data;
 
-  const emailSent = mailer.sendWelcome(email, {data});
+  const emailSent = mailer.sendWelcome(email, {data}, meta);
   // const { mailgun = false, accountsAPI = {} } = meta.environment || {};
   //
   // const locale    = accountsAPI.locale || DEFAULT_LOCALE;
@@ -356,7 +356,7 @@ const lostPassword = async (data, flow, meta) => {
 
       const emailSent = mailer.sendLostPassword(email, {data : {
         password : newPassword
-      }});
+      }}, meta);
 
       // const { mailgun = false, accountsAPI = {} } = meta.environment || {};
       //
